@@ -1,3 +1,4 @@
+import collections.abc
 import enum
 import itertools
 import random
@@ -6,6 +7,7 @@ from collections import deque
 from datetime import datetime, timedelta
 
 from pydantic import BaseModel
+from sqlitedict import SqliteDict
 
 from . import users
 
@@ -36,7 +38,6 @@ seat_map: dict[tuple[TableState, int], TableState] = {
     (TableState.CP2W, 1): TableState.BS,
 }
 
-
 ready_map: dict[tuple[TableState, int], TableState] = {
     (TableState.BS, 1): TableState.P1R,
     (TableState.BS, 2): TableState.P2R,
@@ -62,26 +63,32 @@ class TableStatus(BaseModel):
     moves: list[Move]
 
 
-table_passes: dict[int, str] = {}
-table_state: dict[int, TableState] = {}
-table_dueler: dict[int, tuple[int, int, bool]] = {}
-table_queue: dict[int, list[int]] = {}
-table_moves: dict[int, list[tuple[int, int]]] = {}
+table_passes: collections.abc.MutableMapping[int, str] = \
+    SqliteDict("data/gomoku.db", tablename="table_passes", autocommit=True)
+table_state: collections.abc.MutableMapping[int, TableState] = \
+    SqliteDict("data/gomoku.db", tablename="table_state", autocommit=True)
+table_dueler: collections.abc.MutableMapping[int, tuple[int, int, bool]] = \
+    SqliteDict("data/gomoku.db", tablename="table_dueler", autocommit=True)
+table_queue: collections.abc.MutableMapping[int, list[int]] = \
+    SqliteDict("data/gomoku.db", tablename="table_queue", autocommit=True)
+table_moves: collections.abc.MutableMapping[int, list[tuple[int, int]]] = \
+    SqliteDict("data/gomoku.db", tablename="table_moves", autocommit=True)
 
-
-table_user_heartbeat: dict[tuple[int, int], datetime] = {}
+table_user_heartbeat: collections.abc.MutableMapping[str, datetime] = \
+    SqliteDict("data/gomoku.db", tablename="table_user_heartbeat", autocommit=True)
 
 
 def heartbeat(table_id, user_id):
-    table_user_heartbeat[table_id, user_id] = datetime.now()
+    table_user_heartbeat[f"{table_id},{user_id}"] = datetime.now()
 
 
 def clean_dead():
     death = datetime.now() - timedelta(seconds=10)
     cleaned = []
-    for ((table_id, user_id), beat) in table_user_heartbeat.items():
+    for (tuid, beat) in table_user_heartbeat.items():
         if beat < death:
-            cleaned.append((table_id, user_id))
+            table_id, user_id = map(int, tuid.split(","))
+            cleaned.append(tuid)
             if user_id in table_queue[table_id]:
                 table_queue[table_id].remove(user_id)
             elif user_id in (dueler := table_dueler[table_id]):
@@ -105,9 +112,6 @@ def create_table(tablepass: str):
     table_queue[table_id] = []
     table_moves[table_id] = []
     return table_id
-
-
-create_table("table")
 
 
 def construct_face(moves: list[Move]) -> list[list[int]]:

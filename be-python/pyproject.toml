@@ -9,6 +9,7 @@ license = "GPL-3.0-or-later"
 python = "^3.10"
 fastapi = "^0.75.0"
 uvicorn = "^0.17.6"
+sqlitedict = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 
