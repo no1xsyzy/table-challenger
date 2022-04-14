@@ -1,9 +1,5 @@
 import { API_HOST } from './API_HOST'
-
-interface User {
-  user_id: number
-  user_name: string
-}
+import type { User } from '$lib/types/user'
 
 export async function register(userpass: string): Promise<number> {
   const r = await fetch(`${API_HOST}/users?userpass=${userpass}`, { method: 'POST' })

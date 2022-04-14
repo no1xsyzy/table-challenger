@@ -1,0 +1,16 @@
+{
+  "$id": "user.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "integer"
+    },
+    "user_name": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["user_id", "user_name"]
+}

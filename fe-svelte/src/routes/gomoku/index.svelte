@@ -38,7 +38,7 @@
   $: table_id = +($page.url.searchParams.get('table_id') ?? NaN)
   $: tablepass = $page.url.searchParams.get('tablepass')
 
-  let tableStatus: gomoku.TableStatus
+  let tableStatus: gomoku.GomokuTableStatus
 
   onMount(() => {
     return safeInterval(async () => {

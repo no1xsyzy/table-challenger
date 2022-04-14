@@ -1,0 +1,51 @@
+{
+  "$id": "gomoku.json",
+  "title": "GomokuTableStatus",
+  "type": "object",
+  "properties": {
+    "table_id": {
+      "type": "integer"
+    },
+    "state": {
+      "type": "integer",
+      "enum": [0, 1, 2, 100, 101, 102, 200, 300, 301]
+    },
+    "player1": {
+      "$ref": "user.json"
+    },
+    "player2": {
+      "$ref": "user.json"
+    },
+    "left_is_black": {
+      "type": "boolean"
+    },
+    "queue": {
+      "type": "array",
+      "items": {
+        "$ref": "user.json"
+      }
+    },
+    "moves": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Move"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "required": ["table_id", "state", "player1", "player2", "left_is_black", "queue", "moves"],
+  "definitions": {
+    "Move": {
+      "properties": {
+        "x": {
+          "type": "integer"
+        },
+        "y": {
+          "type": "integer"
+        }
+      },
+      "required": ["x", "y"],
+      "additionalProperties": false
+    }
+  }
+}

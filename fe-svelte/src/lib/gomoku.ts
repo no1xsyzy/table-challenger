@@ -1,4 +1,6 @@
 import { API_HOST } from './API_HOST'
+import type { Move, User, GomokuTableStatus } from './types/gomoku'
+export type { Move, User, GomokuTableStatus }
 
 export enum TableState {
   IDLE = 0,
@@ -10,26 +12,6 @@ export enum TableState {
   PLAYING = 200,
   CP1W = 300,
   CP2W = 301,
-}
-
-export interface Move {
-  x: number
-  y: number
-}
-
-export interface User {
-  user_id: number
-  user_name: string
-}
-
-export interface TableStatus {
-  table_id: number
-  state: TableState
-  player1: User
-  player2: User
-  left_is_black: boolean
-  queue: User[]
-  moves: Move[]
 }
 
 export type playerReadyResponse = 'not user' | 'not table' | 'cannot ready' | 'not dueler' | 'ready'
@@ -61,7 +43,7 @@ export async function see_table(
   tablepass: string,
   uid: number,
   userpass: string,
-): Promise<TableStatus> {
+): Promise<GomokuTableStatus> {
   const r = await fetch(`${API_HOST}/gomoku/table/${table_id}?tablepass=${tablepass}&uid=${uid}&userpass=${userpass}`)
   if (r.status != 200) throw (await r.json()).detail
   return r.json()
