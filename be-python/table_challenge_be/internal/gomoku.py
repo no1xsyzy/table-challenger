@@ -1,67 +1,33 @@
 import collections.abc
-import enum
 import itertools
 import random
 import typing
 from collections import deque
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel
 from sqlitedict import SqliteDict
 
-from . import users
+from ..models.gomoku import TableState, GomokuTableStatus, Move
 
-
-class Table(BaseModel):
-    table_id: int
-    table_pass: str
-
-
-class TableState(int, enum.Enum):
-    IDLE = 0
-    P1S = 1
-    P2S = 2
-    BS = 100
-    P1R = 101
-    P2R = 102
-    PLAYING = 200
-    CP1W = 300
-    CP2W = 301
-
+__all__ = ('TableState', 'GomokuTableStatus', 'Move')
 
 seat_map: dict[tuple[TableState, int], TableState] = {
     (TableState.IDLE, 1): TableState.P1S,
     (TableState.IDLE, 2): TableState.P2S,
     (TableState.P1S, 2): TableState.BS,
     (TableState.P2S, 1): TableState.BS,
-    (TableState.CP1W, 2): TableState.BS,
-    (TableState.CP2W, 1): TableState.BS,
+    (TableState.C_P1W, 2): TableState.BS,
+    (TableState.C_P2W, 1): TableState.BS,
 }
 
 ready_map: dict[tuple[TableState, int], TableState] = {
-    (TableState.BS, 1): TableState.P1R,
-    (TableState.BS, 2): TableState.P2R,
-    (TableState.P1R, 2): TableState.PLAYING,
-    (TableState.P2R, 1): TableState.PLAYING,
-    (TableState.CP1W, 1): TableState.P1R,
-    (TableState.CP2W, 2): TableState.P2R,
+    (TableState.BS, 1): TableState.BS_P1R,
+    (TableState.BS, 2): TableState.BS_P2R,
+    (TableState.BS_P1R, 2): TableState.PLAYING,
+    (TableState.BS_P2R, 1): TableState.PLAYING,
+    (TableState.C_P1W, 1): TableState.BS_P1R,
+    (TableState.C_P2W, 2): TableState.BS_P2R,
 }
-
-
-class Move(BaseModel):
-    x: int
-    y: int
-
-
-class TableStatus(BaseModel):
-    table_id: int
-    state: TableState
-    player1: typing.Optional[users.User]
-    player2: typing.Optional[users.User]
-    left_is_black: bool
-    queue: list[users.User]
-    moves: list[Move]
-
 
 table_passes: collections.abc.MutableMapping[int, str] = \
     SqliteDict("data/gomoku.db", tablename="table_passes", autocommit=True)
@@ -159,7 +125,7 @@ def construct_lines_md(face) -> typing.Iterable[typing.Iterable[int]]:
 
 
 def construct_lines_sd(face) -> typing.Iterable[typing.Iterable[int]]:
-    return ((face[t][s - t] for t in range(15 - abs(s - 16))) for s in range(5, 27))
+    return ((face[x][s - x] for x in (range(0, s + 1) if s <= 14 else range(s - 14, 15))) for s in range(4, 25))
 
 
 def check_line(line: typing.Iterable[int]) -> typing.Literal['black', 'white', '']:

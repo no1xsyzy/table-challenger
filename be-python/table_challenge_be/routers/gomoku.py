@@ -17,18 +17,18 @@ def create_table(tablepass: str) -> int:
 
 
 @router.get("/obSv701/all_tables")
-def obtables():
+def observe_tables():
     return gomoku.table_passes
 
 
 @router.get("/gomoku/table/{table_id}")
-def see_table(table_id: int, tablepass: str, uid: int, userpass: str) -> gomoku.TableStatus:
+def see_table(table_id: int, tablepass: str, uid: int, userpass: str) -> gomoku.GomokuTableStatus:
     if not gomoku.check_table(table_id, tablepass):
         raise HTTPException(status_code=404, detail='not table')
     if users.check_user(uid, userpass):
         gomoku.heartbeat(table_id, uid)
     p1, p2, left_is_black = gomoku.table_dueler[table_id]
-    return gomoku.TableStatus(
+    return gomoku.GomokuTableStatus(
         table_id=table_id,
         state=gomoku.table_state[table_id],
         player1=users.users.get(p1),
@@ -84,9 +84,9 @@ def player_ready(table_id: int, tablepass: str, uid: int, userpass: str) -> str:
         return 'cannot ready'
     if next_state == gomoku.TableState.PLAYING:
         gomoku.start_game(table_id)
-    elif state == gomoku.TableState.CP1W:
+    elif state == gomoku.TableState.C_P1W:
         gomoku.kick_user(table_id, 2)
-    elif state == gomoku.TableState.CP2W:
+    elif state == gomoku.TableState.C_P2W:
         gomoku.kick_user(table_id, 1)
     else:
         gomoku.table_state[table_id] = next_state
@@ -114,9 +114,9 @@ def do_move(table_id: int, tablepass: str,
     gomoku.table_moves[table_id].append((move.x, move.y))
     winner = gomoku.check_winner(table_id)
     if (winner == 'black' and lb) or (winner == 'white' and not lb):
-        gomoku.table_state[table_id] = gomoku.TableState.CP1W
+        gomoku.table_state[table_id] = gomoku.TableState.C_P1W
         return 'P1 win'
     if (winner == 'white' and lb) or (winner == 'black' and not lb):
-        gomoku.table_state[table_id] = gomoku.TableState.CP2W
+        gomoku.table_state[table_id] = gomoku.TableState.C_P2W
         return 'P2 win'
     return 'done'

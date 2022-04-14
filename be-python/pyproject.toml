@@ -12,6 +12,7 @@ uvicorn = "^0.17.6"
 sqlitedict = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
+datamodel-code-generator = "^0.11.20"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

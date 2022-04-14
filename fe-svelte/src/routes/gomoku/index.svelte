@@ -58,12 +58,12 @@
   $: p1turn = tableStatus ? tableStatus.left_is_black === (tableStatus.moves.length % 2 == 0) : null
   $: iamp1 = tableStatus?.player1?.user_id == $user_id
   $: iamp2 = tableStatus?.player2?.user_id == $user_id
-  $: my_turn = tableStatus && tableStatus.state == 200 ? (p1turn ? iamp1 : iamp2) : false
+  $: my_turn = tableStatus && tableStatus.state == 'PLAYING' ? (p1turn ? iamp1 : iamp2) : false
 
   let old_state: gomoku.TableState
   $: {
     if (tableStatus?.state != old_state) {
-      old_state = tableStatus?.state
+      old_state = tableStatus?.state as gomoku.TableState
       console.log('state', tableStatus?.state)
     }
   }
@@ -133,16 +133,16 @@
         {#if tableStatus.player1 !== null}
           <td class="player_name" class:me={iamp1}>
             {tableStatus.player1.user_name}
-            {#if tableStatus.state >= 300}
-              {#if tableStatus.state == gomoku.TableState.CP1W}
+            {#if tableStatus.state.startsWith('C')}
+              {#if tableStatus.state == gomoku.TableState.C_P1W}
                 winner {#if iamp1}
                   <button on:click={ready}>ready?</button>
                 {/if}
               {/if}
-            {:else if tableStatus.state == 200}
+            {:else if tableStatus.state == 'PLAYING'}
               <img src={tableStatus.left_is_black ? '/static/gomoku-black.png' : '/static/gomoku-white.png'} alt="" />
-            {:else if tableStatus.state >= 100}
-              {#if tableStatus.state == gomoku.TableState.P1R}
+            {:else if tableStatus.state.startsWith('BS')}
+              {#if tableStatus.state == gomoku.TableState.BS_P1R}
                 ready✔
               {:else if iamp1}
                 <button on:click={ready}>ready?</button>
@@ -156,16 +156,16 @@
         {/if}
         {#if tableStatus.player2 !== null}
           <td class="player_name" class:me={iamp2}>
-            {#if tableStatus.state >= 300}
-              {#if tableStatus.state == gomoku.TableState.CP2W}
+            {#if tableStatus.state.startsWith('C')}
+              {#if tableStatus.state == gomoku.TableState.C_P2W}
                 winner {#if iamp2}
                   <button on:click={ready}>ready?</button>
                 {/if}
               {/if}
-            {:else if tableStatus.state == 200}
+            {:else if tableStatus.state == 'PLAYING'}
               <img src={tableStatus.left_is_black ? '/static/gomoku-white.png' : '/static/gomoku-black.png'} alt="" />
-            {:else if tableStatus.state >= 100}
-              {#if tableStatus.state == gomoku.TableState.P2R}
+            {:else if tableStatus.state.startsWith('BS')}
+              {#if tableStatus.state == gomoku.TableState.BS_P2R}
                 ready✔
               {:else if iamp2}
                 <button on:click={ready}>ready?</button>

@@ -1,17 +1,17 @@
 import { API_HOST } from './API_HOST'
-import type { Move, User, GomokuTableStatus } from './types/gomoku'
-export type { Move, User, GomokuTableStatus }
+import type { Move, GomokuTableStatus } from './types/gomoku'
+export type { Move, GomokuTableStatus }
 
 export enum TableState {
-  IDLE = 0,
-  P1S = 1,
-  P2S = 2,
-  BS = 100,
-  P1R = 101,
-  P2R = 102,
-  PLAYING = 200,
-  CP1W = 300,
-  CP2W = 301,
+  IDLE = 'IDLE',
+  P1S = 'P1S',
+  P2S = 'P2S',
+  BS = 'BS',
+  BS_P1R = 'BS_P1R',
+  BS_P2R = 'BS_P2R',
+  PLAYING = 'PLAYING',
+  C_P1W = 'C_P1W',
+  C_P2W = 'C_P2W',
 }
 
 export type playerReadyResponse = 'not user' | 'not table' | 'cannot ready' | 'not dueler' | 'ready'

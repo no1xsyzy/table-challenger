@@ -5,20 +5,22 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
+export type TableState = "IDLE" | "P1S" | "P2S" | "BS" | "BS_P1R" | "BS_P2R" | "PLAYING" | "C_P1W" | "C_P2W";
+
 export interface GomokuTableStatus {
-  table_id: number
-  state: 0 | 1 | 2 | 100 | 101 | 102 | 200 | 300 | 301
-  player1: User
-  player2: User
-  left_is_black: boolean
-  queue: User[]
-  moves: Move[]
+  table_id: number;
+  state: TableState;
+  player1?: User;
+  player2?: User;
+  left_is_black: boolean;
+  queue: User[];
+  moves: Move[];
 }
 export interface User {
-  user_id: number
-  user_name: string
+  user_id: number;
+  user_name: string;
 }
 export interface Move {
-  x: number
-  y: number
+  x: number;
+  y: number;
 }
