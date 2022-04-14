@@ -64,7 +64,7 @@ def enter_queue(table_id: int, tablepass: str, uid: int, userpass: str) -> str:
             return 'unknown error'
         gomoku.table_state[table_id] = new_state
     else:
-        gomoku.table_queue[table_id].append(uid)
+        gomoku.table_queue[table_id] = [*gomoku.table_queue[table_id], uid]
     return 'success'
 
 
@@ -111,7 +111,9 @@ def do_move(table_id: int, tablepass: str,
         return 'not round'
     # uid | lb | lmb | round?
     # p1  | T  | T   | F
-    gomoku.table_moves[table_id].append((move.x, move.y))
+    print(move)
+    gomoku.table_moves[table_id] = [*gomoku.table_moves[table_id], (move.x, move.y)]
+    print(gomoku.table_moves[table_id])
     winner = gomoku.check_winner(table_id)
     if (winner == 'black' and lb) or (winner == 'white' and not lb):
         gomoku.table_state[table_id] = gomoku.TableState.C_P1W

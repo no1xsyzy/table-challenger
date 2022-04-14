@@ -9,7 +9,15 @@ from sqlitedict import SqliteDict
 
 from ..models.gomoku import TableState, GomokuTableStatus, Move
 
-__all__ = ('TableState', 'GomokuTableStatus', 'Move')
+__all__ = (
+    'TableState', 'GomokuTableStatus', 'Move',
+    'table_passes',
+    'table_state',
+    'table_dueler',
+    'table_queue',
+    'table_moves',
+    'table_user_heartbeat',
+)
 
 seat_map: dict[tuple[TableState, int], TableState] = {
     (TableState.IDLE, 1): TableState.P1S,
@@ -56,7 +64,7 @@ def clean_dead():
             table_id, user_id = map(int, tuid.split(","))
             cleaned.append(tuid)
             if user_id in table_queue[table_id]:
-                table_queue[table_id].remove(user_id)
+                table_queue[table_id] = [m for m in table_queue[table_id] if m != user_id]
             elif user_id in (dueler := table_dueler[table_id]):
                 pass
                 # TODO: dead user auto lose
@@ -148,7 +156,7 @@ def kick_user(table_id: int, pos: int):
         p1, p2, lb = table_dueler[table_id]
         np1 = 0
         if table_queue[table_id]:
-            np1 = table_queue[table_id].pop(0)
+            np1, *table_queue[table_id] = table_queue[table_id]
         table_dueler[table_id] = np1, p2, lb
         table_state[table_id] = calculate_seat(np1, p2)
         table_moves[table_id] = []
@@ -156,7 +164,7 @@ def kick_user(table_id: int, pos: int):
         p1, p2, lb = table_dueler[table_id]
         np2 = 0
         if table_queue[table_id]:
-            np2 = table_queue[table_id].pop(0)
+            np2, *table_queue[table_id] = table_queue[table_id]
         table_dueler[table_id] = p1, np2, lb
         table_state[table_id] = calculate_seat(p1, np2)
         table_moves[table_id] = []
